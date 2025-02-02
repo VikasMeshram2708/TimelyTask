@@ -9,7 +9,7 @@ export const navItem: NavItem[] = [
   },
   {
     title: "Playground",
-    url: "/playgronud",
+    url: "/playground",
     icon: <Clock10 />,
   },
   {

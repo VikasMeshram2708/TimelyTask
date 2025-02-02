@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ModeToggle } from "../mode-toggle";
 import { NavItemsMenu } from "./navitems-menu";
 import googleImg from "@/public/header/google.png";
+import { signIn } from "@/auth";
 
 export default function Navbar() {
   return (
@@ -20,19 +21,32 @@ export default function Navbar() {
 
         {/* Auth  & theme*/}
         <section className="flex items-center gap-4">
-          <Button className="hidden md:flex" variant={"outline"}>
-            <Image
-              width={25}
-              height={25}
-              alt="google authentication using 0auth"
-              src={googleImg}
-              className="bg-cover"
-            />
-            Sign in with Google
-          </Button>
+          <AuthButton />
           <ModeToggle />
         </section>
       </div>
     </header>
+  );
+}
+
+function AuthButton() {
+  return (
+    <form
+      action={async () => {
+        "use server";
+        await signIn("google");
+      }}
+    >
+      <Button type="submit" className="hidden md:flex" variant={"outline"}>
+        <Image
+          width={25}
+          height={25}
+          alt="google authentication using 0auth"
+          src={googleImg}
+          className="bg-cover"
+        />
+        Sign in with Google
+      </Button>
+    </form>
   );
 }

@@ -3,6 +3,7 @@ import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/header/navbar";
+import AuthProvider from "./context/auth-provider";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -25,20 +26,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${roboto} ${robotoMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navbar />
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+    <AuthProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${roboto} ${robotoMono.variable} antialiased`}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </AuthProvider>
   );
 }
