@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Sheet,
@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { navItem } from "@/data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -17,9 +17,53 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import googleImg from "@/public/header/google.png";
 import { useWindowSize } from "@uidotdev/usehooks";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 // Component for small screens
 const NavItemsMenuSM = () => {
+  const { data, status } = useSession();
+
+  if (data && status === "authenticated") {
+    return (
+      <Sheet>
+        <SheetTrigger>
+          <Menu size={"24"} />
+        </SheetTrigger>
+        <SheetContent side="left">
+          <SheetHeader>
+            <SheetTitle className="text-lg font-bold">
+              <Link href="/">TimelyTask</Link>
+            </SheetTitle>
+            <SheetDescription className="py-10" asChild>
+              <ul className="grid gap-7">
+                {navItem.map((item) => (
+                  <li key={item.title}>
+                    <Link
+                      href={item.url}
+                      className={cn("capitalize flex items-center gap-2", {})}
+                    >
+                      {item.icon}
+                      {item.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </SheetDescription>
+            <SheetFooter>
+              <Button
+                onClick={() => signOut()}
+                className="w-full"
+                variant={"destructive"}
+              >
+                <LogOut />
+                Logout
+              </Button>
+            </SheetFooter>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+    );
+  }
   return (
     <Sheet>
       <SheetTrigger>
@@ -46,7 +90,11 @@ const NavItemsMenuSM = () => {
             </ul>
           </SheetDescription>
           <SheetFooter>
-            <Button className="w-full" variant={"outline"}>
+            <Button
+              onClick={() => signIn("google")}
+              className="w-full"
+              variant={"outline"}
+            >
               <Image
                 width={25}
                 height={25}
