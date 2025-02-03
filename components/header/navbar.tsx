@@ -93,6 +93,7 @@ export default function Navbar() {
                 <AuthButton />
               )}
             </motion.div>
+            <ModeToggle />
           </ul>
         </nav>
       </div>
