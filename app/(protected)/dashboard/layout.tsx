@@ -6,6 +6,7 @@ import { ActivityIcon, LogOut, Rss, Settings, UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -66,7 +67,9 @@ export default function RootLayout({
           transition={{ duration: 0.5 }}
           className="flex-1 rounded-3xl p-5"
         >
-          {children}
+          <Suspense fallback={<span className="loader"></span>}>
+            {children}
+          </Suspense>
         </motion.div>
       </div>
     </div>

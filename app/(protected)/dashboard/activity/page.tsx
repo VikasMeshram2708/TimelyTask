@@ -33,18 +33,12 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { sliceDate } from "@/lib/date-formatter";
 
 export const revalidate = 60;
 
 const ActivityPage: NextPage = async () => {
-  const sliceDate = (dateValue: string) => {
-    return new Date(dateValue).toLocaleDateString("en-IN", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-      timeZone: "Asia/Kolkata",
-    });
-  };
+ 
   const allReminders = getReminders();
   const reminders = await allReminders;
 
@@ -64,7 +58,7 @@ const ActivityPage: NextPage = async () => {
         <h1 className="text-base py-5 md:text-xl lg:text-2xl font-bold">
           Last 5 Reminders
         </h1>
-        <ul>
+        <ul className="grid gap-4">
           {reminders?.success &&
             reminders?.meta?.data.map((reminder) => (
               <Card key={reminder.id}>

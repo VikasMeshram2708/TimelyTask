@@ -113,3 +113,53 @@ export const getReminders = async () => {
     };
   }
 };
+
+// Get Profile
+export const getProfile = async () => {
+  const authResult = await auth(); // Check if the user is authenticated
+
+  if (!authResult) {
+    return {
+      error: "Unauthorized",
+      success: false,
+    };
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: String(authResult.user?.email),
+      },
+      select: {
+        createdAt: true,
+        email: true,
+        image: true,
+        lastSeen: true,
+        name: true,
+        role: true,
+        updatedAt: true,
+        subscription: true,
+      },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "No user found",
+      };
+    }
+
+    return {
+      success: true,
+      meta: {
+        data: user,
+      },
+    };
+  } catch (error) {
+    console.error(`Failed to get user details: ${error}`);
+    return {
+      success: false,
+      error: "Failed to get user details. Please try again.",
+    };
+  }
+};
