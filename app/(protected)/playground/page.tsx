@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -38,9 +38,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { z } from "zod";
+import { setReminder } from "@/data-access/actions";
+import toast from "react-hot-toast";
+import { sanitizeErrorType } from "@/types";
 
 const PlayGroundPage: NextPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [error, setError] = useState<sanitizeErrorType | null>(null);
+  const dialogRef = useRef<HTMLButtonElement | null>(null);
 
   // Define form type based on schema
   type FormData = z.infer<typeof reminderSchema>;
@@ -51,23 +56,50 @@ const PlayGroundPage: NextPage = () => {
       description: "",
       dueDate: new Date(),
       priority: "LOW",
-      state: "IN_PROGRESS",
+      state: "PENDING",
     },
     resolver: zodResolver(reminderSchema),
   });
 
   // Handle form submission
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     console.log("Form Data:", { ...data, dueDate: date });
+
+    // Make API call / server action call
+    const res = await setReminder(data);
+
+    if (!res.success) {
+      if (res.sanitizeError) {
+        setError({
+          description: res.sanitizeError.description,
+          title: res.sanitizeError.title,
+          dueDate: res.sanitizeError.dueDate,
+          priority: res.sanitizeError.priority,
+          state: res.sanitizeError.state,
+        });
+      } else {
+        toast.error(res.error || "Something went wrong");
+      }
+      return;
+    }
+
+    // Reset errors and show success message
+    setError(null);
+    toast.success(res.message || "Reminder set successfully");
+
+    // Reset form and close modal
     form.reset();
+    dialogRef.current?.click();
   };
+
   return (
     <div className="min-h-screen w-full">
+      <pre>{JSON.stringify(error, null, 2)}</pre>
       <div className="container mx-auto px-6 py-2">
         <h1 className="text-xl md:text-2xl font-bold py-10">PlayGround</h1>
         <section>
           <Dialog>
-            <DialogTrigger asChild>
+            <DialogTrigger ref={dialogRef} asChild>
               <Button variant="outline" type="button">
                 Add Reminder
               </Button>
@@ -161,6 +193,30 @@ const PlayGroundPage: NextPage = () => {
                       )}
                     />
                   </div>
+                  <FormField
+                    name="state"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Status</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Set Priority" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="IN_PROGRESS">
+                              In Progress
+                            </SelectItem>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="COMPLETED">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button className="w-full md:w-auto" type="submit">
                       Save changes

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/header/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import AuthProvider from "./context/auth-provider";
+import { Toaster } from "react-hot-toast";
 
 const roboto = Roboto({
   weight: ["100", "300", "400", "500", "700", "900"],
@@ -39,6 +40,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </AuthProvider>
