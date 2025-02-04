@@ -15,8 +15,8 @@ import { NavItem } from "./types";
       icon: <Home />,
     },
     {
-      title: "Playground",
-      url: "/playground",
+      title: "Reminders",
+      url: "/reminders",
       icon: <Clock10 />,
     },
     {

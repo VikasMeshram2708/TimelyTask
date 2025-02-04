@@ -67,7 +67,15 @@ export default function RootLayout({
           transition={{ duration: 0.5 }}
           className="flex-1 rounded-3xl p-5"
         >
-          <Suspense fallback={<span className="loader"></span>}>
+          <Suspense
+            fallback={
+              <div
+                className="flex flex-col items-center justify-center w-full min-h-screen"
+              >
+                <span className="loader dark:text-white"></span>
+              </div>
+            }
+          >
             {children}
           </Suspense>
         </motion.div>

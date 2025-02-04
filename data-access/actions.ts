@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { reminderSchema } from "@/models/reminder";
+import { deleteReminderSchema, reminderSchema } from "@/models/reminder";
 import { revalidatePath } from "next/cache";
 
 // Set Reminder
@@ -42,7 +42,7 @@ export const setReminder = async (incData: unknown) => {
       },
     });
 
-    revalidatePath("/playground");
+    revalidatePath("/reminders");
 
     return {
       success: true,
@@ -85,9 +85,9 @@ export const getReminders = async () => {
           email: String(authResult.user?.email),
         },
       },
-      take: 5,
+      take: 10,
       orderBy: {
-        dueDate: "asc",
+        createdAt: "desc",
       },
     });
 
@@ -110,6 +110,67 @@ export const getReminders = async () => {
     return {
       success: false,
       error: "Failed to get reminder. Please try again.",
+    };
+  }
+};
+
+// Delete Reminder
+export const deleteReminder = async (data: { id: string }) => {
+  const authResult = await auth(); // Check if the user is authenticated
+
+  if (!authResult) {
+    return {
+      error: "Unauthorized",
+      success: false,
+    };
+  }
+
+  try {
+    // Sanitize the incoming data
+    const sanitize = deleteReminderSchema.safeParse(data);
+    if (!sanitize.success) {
+      return {
+        success: false,
+        error: sanitize.error.flatten().fieldErrors,
+      };
+    }
+
+    // Validate if the reminder exists
+    const reminderExists = await prisma.reminder.findUnique({
+      where: {
+        id: sanitize.data.id, // Use the sanitized ID directly
+        User: {
+          email: authResult.user?.email as string,
+        },
+      },
+    });
+
+    if (!reminderExists) {
+      return {
+        success: false,
+        error: "Reminder doesn't exist",
+      };
+    }
+
+    // Delete the reminder
+    await prisma.reminder.delete({
+      where: {
+        id: sanitize.data.id, // Corrected: Use the sanitized ID here
+      },
+    });
+
+    // Optionally revalidate or refresh paths
+    revalidatePath("/reminders");
+
+    return {
+      success: true,
+      message: "Reminder deleted successfully",
+    };
+  } catch (error) {
+    console.error(`Failed to delete reminder: ${error}`);
+    return {
+      success: false,
+      error: "Failed to delete reminder. Please try again.",
     };
   }
 };
@@ -138,7 +199,6 @@ export const getProfile = async () => {
         name: true,
         role: true,
         updatedAt: true,
-        subscription: true,
       },
     });
 

@@ -4,7 +4,8 @@ import { NextPage } from "next";
 
 const ProfilePage: NextPage = async () => {
   const res = await getProfile();
-  console.log("res", res.meta?.data);
+  const data = res.meta?.data;
+  // console.log("res", res.meta?.data);
 
   if (res.error) {
     return (
@@ -16,7 +17,7 @@ const ProfilePage: NextPage = async () => {
 
   return (
     <div className="min-h-screen w-full">
-      <ProfileCard res={res.meta?.data} />
+      <ProfileCard data={data} />
     </div>
   );
 };

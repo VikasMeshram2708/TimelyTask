@@ -1,12 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { getReminders } from "@/data-access/actions";
+
+import { deleteReminder, getReminders } from "@/data-access/actions";
 import { NextPage } from "next";
 import {
   DropdownMenu,
@@ -34,18 +28,22 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { sliceDate } from "@/lib/date-formatter";
+import ReminderCards from "./reminder-cards";
+import toast from "react-hot-toast";
+import DeleteReminder from "./delete-reminder";
 
 export const revalidate = 60;
 
 const ActivityPage: NextPage = async () => {
- 
   const allReminders = getReminders();
   const reminders = await allReminders;
 
   if (reminders && reminders.meta?.count === 0) {
     return (
       <div className="min-h-screen w-full">
-        <h1 className="text-base py-5 md:text-xl lg:text-2xl font-bold">No Reminders</h1>
+        <h1 className="text-base py-5 md:text-xl lg:text-2xl font-bold">
+          No Reminders
+        </h1>
         <Button variant={"ghost"}>
           <Link href="/playground">Create Reminder</Link>
         </Button>
@@ -58,29 +56,7 @@ const ActivityPage: NextPage = async () => {
         <h1 className="text-base py-5 md:text-xl lg:text-2xl font-bold">
           Last 5 Reminders
         </h1>
-        <ul className="grid gap-4">
-          {reminders?.success &&
-            reminders?.meta?.data.map((reminder) => (
-              <Card key={reminder.id}>
-                <CardHeader>
-                  <section className="flex justify-between">
-                    <CardTitle className="capitalize">
-                      {reminder.title}
-                    </CardTitle>
-                    <ReminderDropDown />
-                  </section>
-                </CardHeader>
-                <CardContent>
-                  <p className="capitalize">{reminder.description}</p>
-                </CardContent>
-                <CardFooter>
-                  <Badge>
-                    Created on : {sliceDate(reminder.createdAt.toString())}
-                  </Badge>
-                </CardFooter>
-              </Card>
-            ))}
-        </ul>
+        <ReminderCards data={reminders.meta?.data} />
       </div>
     </div>
   );
@@ -88,7 +64,7 @@ const ActivityPage: NextPage = async () => {
 
 export default ActivityPage;
 
-function ReminderDropDown() {
+export function ReminderDropDown({ remId }: { remId: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -120,29 +96,9 @@ function ReminderDropDown() {
             </AlertDialogContent>
           </AlertDialog>
         </DropdownMenuItem>
+
         {/* Delete */}
-        <DropdownMenuItem asChild>
-          <AlertDialog>
-            <AlertDialogTrigger
-              className={cn(buttonVariants({ variant: "ghost" }), "w-full")}
-            >
-              Delete
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction>Continue</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </DropdownMenuItem>
+        <DeleteReminder remId={remId} />
       </DropdownMenuContent>
     </DropdownMenu>
   );

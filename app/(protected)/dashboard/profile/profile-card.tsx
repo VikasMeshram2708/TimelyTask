@@ -12,21 +12,23 @@ import { sliceDate } from "@/lib/date-formatter";
 import { Mail, Bell, Settings, CreditCard } from "lucide-react";
 import Image from "next/image";
 import { motion } from "motion/react";
+import { Role } from "@prisma/client";
 
 type ProfileCardProps = {
-  res: {
-    createdAt: Date;
-    email: string;
-    image: string;
-    lastSeen: Date;
-    name: string;
-    role: "USER" | "ADMIN";
-    updatedAt: Date;
-    subscription: [];
-  };
+  data:
+    | {
+        email: string;
+        createdAt: Date;
+        image: string | null;
+        lastSeen: Date;
+        name: string;
+        role: Role;
+        updatedAt: Date;
+      }
+    | undefined;
 };
 
-export default function ProfileCard({res}: ProfileCardProps) {
+export default function ProfileCard({ data }: ProfileCardProps) {
   return (
     <div className="min-h-screen w-full">
       <div className="container mx-auto px-4 py-8">
@@ -49,8 +51,8 @@ export default function ProfileCard({res}: ProfileCardProps) {
                     className="border-4 border-white rounded-full bg-cover bg-primary-foreground"
                     width={120}
                     height={120}
-                    src={res.image as string}
-                    alt={res.name as string}
+                    src={data?.image as string}
+                    alt={data?.name as string}
                   />
                 </motion.div>
               </div>
@@ -62,7 +64,7 @@ export default function ProfileCard({res}: ProfileCardProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
               >
-                {res.name}
+                {data?.name}
               </motion.h2>
               <motion.div
                 className="text-gray-600 flex items-center justify-center gap-2 mt-2"
@@ -71,7 +73,7 @@ export default function ProfileCard({res}: ProfileCardProps) {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <Mail className="w-4 h-4" />
-                <p>{res.email}</p>
+                <p>{data?.email}</p>
               </motion.div>
               <motion.div
                 className="mt-4"
@@ -81,7 +83,7 @@ export default function ProfileCard({res}: ProfileCardProps) {
               >
                 <Badge className="bg-blue-100 text-blue-600">
                   Joined at:{" "}
-                  {sliceDate(res.createdAt.toString() || Date.now().toString())}
+                  {sliceDate(data?.createdAt.toString() || Date.now().toString())}
                 </Badge>
               </motion.div>
             </CardContent>

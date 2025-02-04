@@ -22,3 +22,14 @@ export const reminderSchema = z.object({
 
 // Infer the type from the schema
 export type reminderSchema = z.infer<typeof reminderSchema>;
+
+/**
+ * Delete Schema
+ */
+
+export const deleteReminderSchema = z.object({
+  id: z.string({ required_error: "Reminder id is required" }).uuid(),
+});
+
+// Infer the type from the schema
+export type deleteReminderSchema = z.infer<typeof deleteReminderSchema>;
