@@ -33,3 +33,15 @@ export const deleteReminderSchema = z.object({
 
 // Infer the type from the schema
 export type deleteReminderSchema = z.infer<typeof deleteReminderSchema>;
+
+/**
+ * Filtering Reminders
+ */
+
+export const filterReminderSchema = z.object({
+  searchValue: z.string({ message: "Search value is required" }).max(25, {
+    message: "Search value can't exceed more than 25 characters.",
+  }),
+});
+
+export type filterReminderSchema = z.infer<typeof filterReminderSchema>;

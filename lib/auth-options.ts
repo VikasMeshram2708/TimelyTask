@@ -2,8 +2,20 @@ import Google from "next-auth/providers/google";
 import prisma from "./prisma";
 import { NextAuthConfig } from "next-auth";
 
-export const authOptions:NextAuthConfig = {
-  providers: [Google],
+export const authOptions: NextAuthConfig = {
+providers: [
+    Google({
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    })
+  ],
   session: {
     strategy: "jwt",
     maxAge: 30 * 60, // 30 min session

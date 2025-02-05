@@ -16,7 +16,29 @@ export const setReminder = async (incData: unknown) => {
     };
   }
 
+  const MAX_REMINDERS = 5; // for now only 5 are allowed
+  const userEmail = authResult.user?.email;
+
   try {
+    // check the records of the user to prevent from creating more than 5 reminders.
+    const remindersCout = await prisma.reminder.count({
+      where: {
+        User: {
+          email: String(userEmail),
+        },
+      },
+    });
+
+    // console.log('remindersCout', remindersCout)
+
+    // >= because indexing starts from 0 in JS
+    if (remindersCout >= MAX_REMINDERS) {
+      return {
+        success: false,
+        error: `You can't create more than ${MAX_REMINDERS} reminders.`,
+      };
+    }
+
     // Sanitize the incoming data
     const sanitize = reminderSchema.safeParse(incData);
 
@@ -29,20 +51,22 @@ export const setReminder = async (incData: unknown) => {
 
     await prisma.reminder.create({
       data: {
-        title: sanitize.data.title,
-        description: sanitize.data.description,
-        dueDate: sanitize.data.dueDate,
-        priority: sanitize.data.priority,
-        state: sanitize.data.state,
+        // title: sanitize.data.title,
+        // description: sanitize.data.description,
+        // dueDate: sanitize.data.dueDate,
+        // priority: sanitize.data.priority,
+        // state: sanitize.data.state,
+        ...sanitize.data,
         User: {
           connect: {
-            email: String(authResult.user?.email),
+            email: String(userEmail),
           },
         },
       },
     });
 
-    revalidatePath("/reminders");
+    // refreshes everything by invalidating all the cahes because data is begin share across multiple pages
+    revalidatePath("/**");
 
     return {
       success: true,

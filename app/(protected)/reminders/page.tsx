@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 const PlayGroundPage: NextPage = async () => {
   const allReminders = getReminders();
   const reminders = await allReminders;
-  
+
   return (
     <div className="min-h-screen w-full">
       <div className="container mx-auto px-6 py-2">
@@ -24,7 +24,9 @@ const PlayGroundPage: NextPage = async () => {
             />
           </section>
           <h2 className="text-lg my-10 md:text-xl lg:text-2xl font-bold">
-            Previous reminders
+            {reminders.meta?.count
+              ? "Previous reminders"
+              : "You dont have any reminder."}
           </h2>
 
           {/* Show previous created reminders */}

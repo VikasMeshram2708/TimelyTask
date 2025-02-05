@@ -45,7 +45,7 @@ const ActivityPage: NextPage = async () => {
           No Reminders
         </h1>
         <Button variant={"ghost"}>
-          <Link href="/playground">Create Reminder</Link>
+          <Link href="/reminders">Create Reminder</Link>
         </Button>
       </div>
     );

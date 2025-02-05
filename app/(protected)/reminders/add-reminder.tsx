@@ -117,7 +117,7 @@ export default function AddReminder() {
               </div>
             ) : (
               <form
-                className="b grid gap-5"
+                className="grid gap-5"
                 onSubmit={form.handleSubmit(onSubmit)}
               >
                 <FormField
